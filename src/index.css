@@ -1,0 +1,193 @@
+/* ============================================================
+   GLOBAL DESIGN SYSTEM — Stellar Ambassadors Hub Brazil
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* --- Brand Colors --- */
+  --primary:          #818cf8;
+  --primary-dim:      #6366f1;
+  --primary-hover:    #a5b4fc;
+  --secondary:        #f472b6;
+  --secondary-dim:    #ec4899;
+  --accent-gold:      #fbbf24;
+  --accent-teal:      #2dd4bf;
+  --stellar-blue:     #60a5fa;
+
+  /* --- Backgrounds --- */
+  --bg-base:          #060b18;
+  --bg-surface:       #0d1526;
+  --bg-card:          #111827;
+  --bg-card-hover:    #172033;
+  --bg-elevated:      #1c2a3f;
+  --bg-input:         #0d1526;
+
+  /* --- Text --- */
+  --text-primary:     #f1f5f9;
+  --text-secondary:   #94a3b8;
+  --text-muted:       #475569;
+  --text-inverted:    #0f172a;
+
+  /* --- Borders --- */
+  --border:           rgba(99, 102, 241, 0.15);
+  --border-bright:    rgba(99, 102, 241, 0.35);
+  --border-subtle:    rgba(255, 255, 255, 0.05);
+
+  /* --- Semantic --- */
+  --success:          #10b981;
+  --success-bg:       rgba(16, 185, 129, 0.12);
+  --danger:           #f87171;
+  --danger-bg:        rgba(248, 113, 113, 0.12);
+  --warning:          #fbbf24;
+  --warning-bg:       rgba(251, 191, 36, 0.12);
+  --info:             #60a5fa;
+  --info-bg:          rgba(96, 165, 250, 0.12);
+
+  /* --- Glow Effects --- */
+  --glow-primary:     0 0 20px rgba(99, 102, 241, 0.3);
+  --glow-secondary:   0 0 20px rgba(244, 114, 182, 0.3);
+  --glow-gold:        0 0 20px rgba(251, 191, 36, 0.35);
+
+  /* --- Shadows --- */
+  --shadow-sm:        0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md:        0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg:        0 10px 40px rgba(0, 0, 0, 0.5);
+  --shadow-card:      0 4px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--border);
+
+  /* --- Radii --- */
+  --radius-sm:        6px;
+  --radius-md:        10px;
+  --radius-lg:        16px;
+  --radius-xl:        24px;
+  --radius-full:      9999px;
+
+  /* --- Spacing scale --- */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* --- Transitions --- */
+  --transition-fast:   all 0.15s ease;
+  --transition-base:   all 0.25s ease;
+  --transition-slow:   all 0.4s ease;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Subtle star-like background */
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(244, 114, 182, 0.06) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: var(--transition-base);
+}
+
+input, select, textarea {
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition-base);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-dim); }
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

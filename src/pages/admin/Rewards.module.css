@@ -1,0 +1,246 @@
+.container {
+  padding: 2.5rem 1.5rem;
+}
+
+.inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ── Page header ─────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-hover) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pageSub {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+.btnNew {
+  padding: 0.65rem 1.25rem;
+  background: var(--primary-dim);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  white-space: nowrap;
+  align-self: flex-start;
+}
+.btnNew:hover {
+  background: var(--primary);
+  box-shadow: var(--glow-primary);
+}
+
+/* ── Form card ───────────────────────────────────── */
+.formCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  box-shadow: var(--glow-primary);
+  animation: fadeIn 0.3s ease;
+}
+
+.formTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.formGroup label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+}
+
+.input,
+.select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.9rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  width: 100%;
+  transition: var(--transition-base);
+}
+.input::placeholder { color: var(--text-muted); }
+.input:focus,
+.select:focus {
+  border-color: var(--primary-dim);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+/* Fix select arrow on dark bg */
+.select option { background: var(--bg-elevated); }
+
+.formActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.btnCancel {
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+.btnCancel:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+.btnSubmit {
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: var(--primary-dim);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+.btnSubmit:hover:not(:disabled) {
+  background: var(--primary);
+  box-shadow: var(--glow-primary);
+}
+.btnSubmit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Table ───────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table thead tr {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.thRight { text-align: right; }
+
+.row {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+.row:last-child { border-bottom: none; }
+.row:hover { background: var(--bg-card-hover); }
+
+.table td {
+  padding: 0.85rem 1.25rem;
+  vertical-align: middle;
+}
+
+.rewardTitle {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.amount {
+  text-align: right;
+}
+
+.xlmPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(99,102,241,0.12);
+  color: var(--primary-hover);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: var(--radius-full);
+  padding: 0.2rem 0.65rem;
+}
+
+.hash {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--accent-teal);
+  word-break: break-all;
+}
+
+.emptyCell {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+/* ── Loader ──────────────────────────────────────── */
+.loaderWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

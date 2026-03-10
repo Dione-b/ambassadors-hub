@@ -1,7 +1,7 @@
 // In-memory data structures modeled after the global database spec
 const mock_data = {
   users: [
-    { id: 1, name: 'Alice Chen', city: 'Singapore', country: 'Singapore', points: 120, badges: ['Wallet Connected', 'Community Joined', 'First Meeting'], stellar_wallet: 'GABC123...', onboarded: false },
+    { id: 1, name: 'Alice Chen', city: 'Singapore', country: 'Singapore', points: 0, badges: [], stellar_wallet: 'GABC123...', onboarded: false },
     { id: 2, name: 'Carlos Mendez', city: 'Mexico City', country: 'Mexico', points: 250, badges: ['Wallet Connected', 'Community Joined', 'First Meeting', 'Trained Ambassador'], stellar_wallet: 'GBCD456...', onboarded: true },
     { id: 3, name: 'Fatima Diallo', city: 'Dakar', country: 'Senegal', points: 80, badges: ['Wallet Connected'], stellar_wallet: 'GDEF789...', onboarded: false },
     { id: 4, name: 'John Smith', city: 'London', country: 'UK', points: 310, badges: ['Wallet Connected', 'Community Joined', 'First Meeting', 'Trained Ambassador', 'Content Creator'], stellar_wallet: 'GHIJ012...', onboarded: true }

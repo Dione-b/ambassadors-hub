@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getOnboardingSteps, completeStep, awardGenesisBadge } from '../../services/mockApi';
+import { getOnboardingSteps, awardGenesisBadge } from '../../services/mockApi';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import confetti from 'canvas-confetti';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ const VideoThumbnail = () => {
   if (isPlaying) {
     return (
       <div className="overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-lg">
-        <div className="relative w-full pb-[56.25%]"> {/* 16:9 Aspect Ratio */}
+        <div className="relative w-full pb-[56.25%]">
           <iframe
             className="absolute left-0 top-0 h-full w-full border-0"
             src="https://www.youtube.com/embed/5C_HPTJg5ek?rel=0&autoplay=1"
@@ -27,14 +27,12 @@ const VideoThumbnail = () => {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border-default shadow-lg cursor-pointer transition-all duration-300 hover:border-primary-dim hover:shadow-glow-primary" onClick={() => setIsPlaying(true)}>
       <div className="relative w-full pb-[56.25%] bg-gradient-to-br from-bg-elevated via-bg-card to-bg-base">
-        {/* Placeholder decorative elements */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1)_0%,transparent_60%)]"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
           <div className="text-center">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white drop-shadow-md">Welcome, Ambassador!</h2>
             <p className="mt-2 text-sm sm:text-base font-semibold text-text-secondary drop-shadow-sm">Click to watch your orientation video</p>
           </div>
-          
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-dim text-white shadow-glow-secondary shadow-[0_0_20px_rgba(244,114,182,0.4)] transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary">
             <svg className="ml-1 h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
@@ -46,26 +44,56 @@ const VideoThumbnail = () => {
   );
 };
 
-
-
 const Onboard = () => {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [steps, setSteps] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingStep, setLoadingStep] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchSteps = useCallback(async () => {
     try {
-      setLoading(true);
       const stepsData = await getOnboardingSteps(user.id);
       setSteps(stepsData);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  }, [user.id]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+      // Check if all steps were completed (e.g. from the detail page)
+      const allDone = stepsData.every(s => s.completed);
+      if (allDone && !user.onboarded) {
+        const fullyOnboarded = await awardGenesisBadge(user.id);
+        updateUser({
+          points: fullyOnboarded.points,
+          badges: fullyOnboarded.badges,
+          onboarded: fullyOnboarded.onboarded,
+        });
+        fireConfetti();
+        setShowModal(true);
+      }
+
+      return stepsData;
+    } catch (err) { console.error(err); }
+  }, [user.id, user.onboarded]);
+
+  // Initial load
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true);
+      await fetchSteps();
+      setLoading(false);
+    };
+    init();
+  }, [fetchSteps]);
+
+  // Re-fetch when user returns to this tab (after completing a step in StepDetail)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchSteps();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [fetchSteps]);
 
   const fireConfetti = () => {
     const duration = 3000;
@@ -94,39 +122,6 @@ const Onboard = () => {
     frame();
   };
 
-  const handleCompleteStep = async (stepName) => {
-    try {
-      setLoadingStep(stepName);
-      const updatedUser = await completeStep(user.id, stepName);
-      
-      const updatedSteps = await getOnboardingSteps(user.id);
-      setSteps(updatedSteps);
-
-      const isAllDone = updatedSteps.every(s => s.completed);
-      
-      if (isAllDone) {
-        const fullyOnboardedUser = await awardGenesisBadge(user.id);
-        updateUser({ 
-          points: fullyOnboardedUser.points, 
-          badges: fullyOnboardedUser.badges, 
-          onboarded: fullyOnboardedUser.onboarded 
-        });
-        fireConfetti();
-        setShowModal(true);
-      } else {
-        updateUser({ 
-          points: updatedUser.points, 
-          badges: updatedUser.badges, 
-          onboarded: updatedUser.onboarded 
-        });
-      }
-      
-
-      
-    } catch (err) { alert(err.message); }
-    finally { setLoadingStep(null); }
-  };
-
   if (loading) return (
     <div className="flex h-[40vh] items-center justify-center">
       <div className="h-8 w-8 animate-spin rounded-full border-3 border-border-default border-t-primary" />
@@ -140,13 +135,15 @@ const Onboard = () => {
           <h1 className="mb-2 text-3xl font-extrabold text-text-primary">Welcome to Stellar Hub</h1>
           <p className="text-sm text-text-secondary">Watch your orientation video below before starting your ambassador journey.</p>
         </div>
-        
         <VideoThumbnail />
       </div>
 
-      <OnboardingProgress steps={steps} onCompleteStep={handleCompleteStep} loadingStep={loadingStep} />
-      
+      {/* Hint */}
+      <p className="mb-4 text-xs font-semibold text-text-muted">
+        💡 Click on any step card to view detailed instructions.
+      </p>
 
+      <OnboardingProgress steps={steps} />
 
       {/* Celebration Modal */}
       {showModal && (

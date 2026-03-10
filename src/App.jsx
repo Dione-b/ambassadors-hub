@@ -14,6 +14,7 @@ import Dashboard from './pages/ambassador/Dashboard';
 import Onboard from './pages/ambassador/Onboard';
 import Meetings from './pages/ambassador/Meetings';
 import Profile from './pages/ambassador/Profile';
+import StepDetail from './pages/ambassador/onboard/StepDetail';
 
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -52,6 +53,7 @@ const AppContent = () => {
           {/* AMBASSADOR ROUTES */}
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['ambassador']}><Dashboard /></ProtectedRoute>} />
           <Route path="/onboard" element={<ProtectedRoute allowedRoles={['ambassador']}><Onboard /></ProtectedRoute>} />
+          <Route path="/onboard/step/:stepId" element={<ProtectedRoute allowedRoles={['ambassador']}><StepDetail /></ProtectedRoute>} />
           <Route path="/meetings" element={<ProtectedRoute allowedRoles={['ambassador']}><Meetings /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['ambassador']}><Profile /></ProtectedRoute>} />
 

@@ -9,8 +9,8 @@ const MOCK_AMBASSADOR = {
   email: 'alice@example.com',
   city: 'Singapore',
   country: 'Singapore',
-  points: 120,
-  badges: ['Wallet Connected', 'Community Joined', 'First Meeting'],
+  points: 0,
+  badges: [],
   stellar_wallet: 'GABC123...',
   onboarded: false,
 };

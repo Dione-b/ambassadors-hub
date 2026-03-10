@@ -21,6 +21,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const ManageMeetings = lazy(() => import('./pages/admin/ManageMeetings'));
 const ManageRewards = lazy(() => import('./pages/admin/ManageRewards'));
 const ManageAmbassadors = lazy(() => import('./pages/admin/ManageAmbassadors'));
+const AmbassadorDetail = lazy(() => import('./pages/admin/AmbassadorDetail'));
 
 const LazyFallback = () => (
   <div className="flex min-h-[400px] items-center justify-center">
@@ -67,6 +68,7 @@ const AppContent = () => {
           <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={['admin']}><Suspense fallback={<LazyFallback />}><ManageMeetings /></Suspense></ProtectedRoute>} />
           <Route path="/admin/rewards" element={<ProtectedRoute allowedRoles={['admin']}><Suspense fallback={<LazyFallback />}><ManageRewards /></Suspense></ProtectedRoute>} />
           <Route path="/admin/ambassadors" element={<ProtectedRoute allowedRoles={['admin']}><Suspense fallback={<LazyFallback />}><ManageAmbassadors /></Suspense></ProtectedRoute>} />
+          <Route path="/admin/ambassadors/:id" element={<ProtectedRoute allowedRoles={['admin']}><Suspense fallback={<LazyFallback />}><AmbassadorDetail /></Suspense></ProtectedRoute>} />
 
           {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/" replace />} />

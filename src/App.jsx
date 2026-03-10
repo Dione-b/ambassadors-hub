@@ -13,7 +13,6 @@ import Login from './pages/public/Login';
 import Dashboard from './pages/ambassador/Dashboard';
 import Onboard from './pages/ambassador/Onboard';
 import Meetings from './pages/ambassador/Meetings';
-import Ranking from './pages/ambassador/Ranking';
 import Profile from './pages/ambassador/Profile';
 
 // Admin
@@ -54,7 +53,6 @@ const AppContent = () => {
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['ambassador']}><Dashboard /></ProtectedRoute>} />
           <Route path="/onboard" element={<ProtectedRoute allowedRoles={['ambassador']}><Onboard /></ProtectedRoute>} />
           <Route path="/meetings" element={<ProtectedRoute allowedRoles={['ambassador']}><Meetings /></ProtectedRoute>} />
-          <Route path="/ranking" element={<ProtectedRoute allowedRoles={['ambassador']}><Ranking /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['ambassador']}><Profile /></ProtectedRoute>} />
 
           {/* ADMIN ROUTES */}

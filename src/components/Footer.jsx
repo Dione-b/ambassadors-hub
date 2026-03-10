@@ -1,13 +1,10 @@
 import React from 'react';
-import styles from './Footer.module.css';
 
 const Footer = () => (
-  <footer className={styles.footer}>
-    <div className={styles.inner}>
-      <span className={styles.brand}>✦ Stellar Ambassadors Hub</span>
-      <span className={styles.copy}>
-        © {new Date().getFullYear()} — Global Ambassador Program
-      </span>
+  <footer className="border-t border-border-subtle py-5 px-6 mt-auto">
+    <div className="mx-auto flex max-w-[1200px] items-center justify-between text-xs text-text-muted">
+      <span className="font-semibold text-text-secondary">✦ Stellar Ambassadors Hub</span>
+      <span>© {new Date().getFullYear()} — Global Ambassador Program</span>
     </div>
   </footer>
 );

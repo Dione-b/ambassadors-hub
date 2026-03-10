@@ -168,11 +168,6 @@ export const getMeetingAttendees = async (meetingId) => {
 
 // --- USER MANAGEMENT ---
 
-export const getRanking = async () => {
-  await delay();
-  return [...users].sort((a, b) => b.points - a.points);
-};
-
 export const getUserProfile = async (userId) => {
   await delay();
   const user = users.find(u => u.id === userId);

@@ -5,14 +5,17 @@ import styles from './Header.module.css';
 
 const AMBASSADOR_LINKS = [
   { label: 'Dashboard', to: '/dashboard' },
-  { label: 'Profile',   to: '/profile' },
+  { label: 'Onboard',   to: '/onboard' },
+  { label: 'Meetings',  to: '/meetings' },
   { label: 'Ranking',   to: '/ranking' },
+  { label: 'Profile',   to: '/profile' },
 ];
 
 const ADMIN_LINKS = [
-  { label: 'Meetings', to: '/admin' },
-  { label: 'Rewards',  to: '/admin/rewards' },
-  { label: 'Ranking',  to: '/ranking' },
+  { label: 'Overview',     to: '/admin' },
+  { label: 'Meetings',     to: '/admin/meetings' },
+  { label: 'Rewards',      to: '/admin/rewards' },
+  { label: 'Ambassadors',  to: '/admin/ambassadors' },
 ];
 
 const Header = () => {
@@ -20,41 +23,37 @@ const Header = () => {
   const navigate = useNavigate();
 
   const links = role === 'admin' ? ADMIN_LINKS : AMBASSADOR_LINKS;
+  const homeRoute = role === 'admin' ? '/admin' : '/dashboard';
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  const homeRoute = role === 'admin' ? '/admin' : '/dashboard';
-
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        {/* Logo */}
         <NavLink to={homeRoute} className={styles.logo}>
           <span className={styles.logoIcon}>✦</span>
           <span className={styles.logoText}>
-            Stellar<span className={styles.logoAccent}>Hub</span> BR
+            Stellar<span className={styles.logoAccent}>Hub</span>
           </span>
         </NavLink>
 
-        {/* Navigation */}
         <nav className={styles.nav} aria-label="Main navigation">
-          {links.map(({ label, to }) => (
+          {links.map((link) => (
             <NavLink
-              key={to}
-              to={to}
+              key={link.to}
+              to={link.to}
               className={({ isActive }) =>
                 `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`
               }
             >
-              {label}
+              {link.label}
             </NavLink>
           ))}
         </nav>
 
-        {/* User info + logout */}
         <div className={styles.userArea}>
           {role === 'ambassador' && user && (
             <div className={styles.pointsPill}>
@@ -64,12 +63,8 @@ const Header = () => {
             </div>
           )}
           <div className={styles.userName}>{user?.name?.split(' ')[0]}</div>
-          <button
-            className={styles.logoutBtn}
-            onClick={handleLogout}
-            aria-label="Logout"
-          >
-            Sair
+          <button className={styles.logoutBtn} onClick={handleLogout} aria-label="Log out">
+            Logout
           </button>
         </div>
       </div>

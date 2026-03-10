@@ -5,35 +5,38 @@ import RankingTable from '../../components/RankingTable';
 import styles from './Ranking.module.css';
 
 const Ranking = () => {
-  const { user, role } = useAuth();
-  const [users,   setUsers]   = useState([]);
+  const { user } = useAuth();
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRanking()
-      .then(setUsers)
-      .finally(() => setLoading(false));
+    const fetchRanking = async () => {
+      try {
+        const data = await getRanking();
+        setUsers(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRanking();
   }, []);
-
-  // The current user ID is only relevant for ambassador highlighting
-  const currentUserId = role === 'ambassador' ? user?.id : null;
 
   return (
     <div className={styles.container}>
       <div className={styles.inner}>
-        <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>Ranking de Embaixadores</h1>
-          <p className={styles.pageSub}>
-            Classificação por pontos — atualizado em tempo real
-          </p>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Global Leaderboard</h1>
+          <p className={styles.subtitle}>Ranking is updated in real-time based on your contributions.</p>
         </div>
 
         {loading ? (
           <div className={styles.loaderWrapper}>
-            <div className={styles.spinner} />
+            <div className={styles.spinner}></div>
           </div>
         ) : (
-          <RankingTable users={users} currentUserId={currentUserId} />
+          <RankingTable users={users} currentUserId={user.id} />
         )}
       </div>
     </div>

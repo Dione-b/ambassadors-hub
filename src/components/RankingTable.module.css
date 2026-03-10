@@ -26,27 +26,16 @@
   white-space: nowrap;
 }
 
-.thPos {
-  width: 60px;
-  text-align: center;
-}
-
-.thPoints {
-  text-align: right;
-}
+.thPos { width: 60px; text-align: center; }
+.thPoints { text-align: right; }
 
 .row {
   border-bottom: 1px solid var(--border-subtle);
   transition: background 0.15s ease;
 }
 
-.row:last-child {
-  border-bottom: none;
-}
-
-.row:hover {
-  background: var(--bg-card-hover);
-}
+.row:last-child { border-bottom: none; }
+.row:hover { background: var(--bg-card-hover); }
 
 .currentUser {
   background: rgba(99, 102, 241, 0.07) !important;
@@ -58,23 +47,10 @@
   vertical-align: middle;
 }
 
-/* ── Position ───────────────────────────────────── */
-.pos {
-  text-align: center;
-}
+.pos { text-align: center; }
+.medal { font-size: 1.25rem; line-height: 1; filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.2)); }
+.posNum { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
 
-.medal {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.posNum {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-/* ── Name ───────────────────────────────────────── */
 .name {
   display: flex;
   align-items: center;
@@ -104,29 +80,26 @@
   color: var(--primary-hover);
   border-radius: var(--radius-full);
   padding: 0.1rem 0.45rem;
+  margin-left: 0.25rem;
 }
 
-/* ── City ───────────────────────────────────────── */
-.city {
+.country {
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-/* ── Points ─────────────────────────────────────── */
-.points {
-  text-align: right;
-}
-
+.points { text-align: right; }
 .pointsValue {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--accent-gold);
 }
 
-/* ── Badges ─────────────────────────────────────── */
 .badges {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.35rem;
 }
 
@@ -139,4 +112,14 @@
   border-radius: var(--radius-full);
   padding: 0.2rem 0.55rem;
   white-space: nowrap;
+}
+
+.badgeMore {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 0.2rem 0.4rem;
 }

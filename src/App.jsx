@@ -2,30 +2,42 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-import Header  from './components/Header';
-import Footer  from './components/Footer';
-import Login   from './pages/Login';
+// Layout / Components
+import Header from './components/Header';
+import Footer from './components/Footer';
 
-// Ambassador pages
+// Public
+import Login from './pages/public/Login';
+
+// Ambassador
 import Dashboard from './pages/ambassador/Dashboard';
-import Profile   from './pages/ambassador/Profile';
-import Ranking   from './pages/ambassador/Ranking';
+import Onboard from './pages/ambassador/Onboard';
+import Meetings from './pages/ambassador/Meetings';
+import Ranking from './pages/ambassador/Ranking';
+import Profile from './pages/ambassador/Profile';
 
-// Admin pages
-import Meetings from './pages/admin/Meetings';
-import Rewards  from './pages/admin/Rewards';
+// Admin
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ManageMeetings from './pages/admin/ManageMeetings';
+import ManageRewards from './pages/admin/ManageRewards';
+import ManageAmbassadors from './pages/admin/ManageAmbassadors';
 
-// ─── Route Guards ────────────────────────────────────────────
-
+/**
+ * Basic Route Guard
+ */
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { role } = useAuth();
   if (role === 'guest') return <Navigate to="/" replace />;
-  if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/" replace />;
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    // If Admin enters ambassador link, or vice-versa
+    return <Navigate to={role === 'admin' ? '/admin' : '/dashboard'} replace />;
+  }
   return children;
 };
 
-// ─── App Shell ───────────────────────────────────────────────
-
+/**
+ * Core Application Shell
+ */
 const AppContent = () => {
   const { role } = useAuth();
   const isAuthenticated = role !== 'guest';
@@ -33,45 +45,29 @@ const AppContent = () => {
   return (
     <>
       {isAuthenticated && <Header />}
+      
       <main style={{ flexGrow: 1, paddingBottom: isAuthenticated ? '2rem' : 0 }}>
         <Routes>
           <Route path="/" element={<Login />} />
 
-          {/* Ambassador */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={['ambassador']}>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute allowedRoles={['ambassador']}>
-              <Profile />
-            </ProtectedRoute>
-          } />
+          {/* AMBASSADOR ROUTES */}
+          <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['ambassador']}><Dashboard /></ProtectedRoute>} />
+          <Route path="/onboard" element={<ProtectedRoute allowedRoles={['ambassador']}><Onboard /></ProtectedRoute>} />
+          <Route path="/meetings" element={<ProtectedRoute allowedRoles={['ambassador']}><Meetings /></ProtectedRoute>} />
+          <Route path="/ranking" element={<ProtectedRoute allowedRoles={['ambassador']}><Ranking /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute allowedRoles={['ambassador']}><Profile /></ProtectedRoute>} />
 
-          {/* Shared */}
-          <Route path="/ranking" element={
-            <ProtectedRoute allowedRoles={['ambassador', 'admin']}>
-              <Ranking />
-            </ProtectedRoute>
-          } />
+          {/* ADMIN ROUTES */}
+          <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={['admin']}><ManageMeetings /></ProtectedRoute>} />
+          <Route path="/admin/rewards" element={<ProtectedRoute allowedRoles={['admin']}><ManageRewards /></ProtectedRoute>} />
+          <Route path="/admin/ambassadors" element={<ProtectedRoute allowedRoles={['admin']}><ManageAmbassadors /></ProtectedRoute>} />
 
-          {/* Admin */}
-          <Route path="/admin" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <Meetings />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/rewards" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <Rewards />
-            </ProtectedRoute>
-          } />
-
-          {/* Fallback */}
+          {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
       {isAuthenticated && <Footer />}
     </>
   );

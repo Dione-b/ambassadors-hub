@@ -2,50 +2,51 @@ import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext(null);
 
-// Mock user data matching the specification
+// Mocks the authenticated state, matching the API's standard structure
 const MOCK_AMBASSADOR = {
   id: 1,
-  name: 'Ana Silva',
-  email: 'ana@example.com',
-  city: 'São Paulo',
+  name: 'Alice Chen',
+  email: 'alice@example.com',
+  city: 'Singapore',
+  country: 'Singapore',
   points: 120,
-  badges: ['Meetup Organizer', 'Content Creator'],
-  stellar_wallet: 'GABC123XXX',
+  badges: ['Wallet Connected', 'Community Joined', 'First Meeting'],
+  stellar_wallet: 'GABC123...',
+  onboarded: false,
 };
 
 const MOCK_ADMIN = {
   id: 99,
   name: 'Admin User',
-  email: 'admin@stellarhub.br',
+  email: 'admin@stellar.org',
 };
 
 export const AuthProvider = ({ children }) => {
-  // State tracks the active user and their role
-  const [role, setRole] = useState('guest');
+  const [role, setRole] = useState('guest'); // 'guest' | 'ambassador' | 'admin'
   const [user, setUser] = useState(null);
 
   /**
-   * Simulates login by setting a predetermined mock user
-   * based on the selected role ('ambassador' | 'admin').
+   * Logs in a user by their selected role
    */
   const login = (selectedRole) => {
     setRole(selectedRole);
     if (selectedRole === 'ambassador') {
-      // Spread so mutations on user.points don't affect the original constant
       setUser({ ...MOCK_AMBASSADOR });
     } else if (selectedRole === 'admin') {
       setUser({ ...MOCK_ADMIN });
     }
   };
 
+  /**
+   * Clears the active session
+   */
   const logout = () => {
     setRole('guest');
     setUser(null);
   };
 
   /**
-   * Updates a specific field on the current user in context.
-   * Used after attendance registration to reflect new point total.
+   * Updates fields on the logged-in user in context memory
    */
   const updateUser = (fields) => {
     setUser((prev) => (prev ? { ...prev, ...fields } : prev));

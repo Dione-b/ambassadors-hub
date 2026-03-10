@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
-import { getOnboardingSteps, completeStep, awardGenesisBadge } from '../../../services/mockApi';
+import { fetchOnboardingSteps, fetchCompleteStep, fetchAwardGenesisBadge } from '../../../services/apiClient';
 
 const STEP_GUIDES = [
   {
@@ -81,9 +81,8 @@ const StepDetail = () => {
     const fetchStep = async () => {
       try {
         setLoading(true);
-        const steps = await getOnboardingSteps(user.id);
-        
-        // Sequential check: step is locked if index > 0 and previous step not completed
+        const steps = await fetchOnboardingSteps(user.id);
+
         const locked = stepIndex > 0 && !steps[stepIndex - 1].completed;
         setIsLocked(locked);
 
@@ -102,13 +101,13 @@ const StepDetail = () => {
     try {
       setSubmitting(true);
       setFeedback(null);
-      const updatedUser = await completeStep(user.id, stepData.name);
+      const updatedUser = await fetchCompleteStep(user.id, stepData.name);
 
-      const allSteps = await getOnboardingSteps(user.id);
+      const allSteps = await fetchOnboardingSteps(user.id);
       const isAllDone = allSteps.every(s => s.completed);
 
       if (isAllDone) {
-        const fullyOnboarded = await awardGenesisBadge(user.id);
+        const fullyOnboarded = await fetchAwardGenesisBadge(user.id);
         updateUser({
           points: fullyOnboarded.points,
           badges: fullyOnboarded.badges,
@@ -177,7 +176,6 @@ const StepDetail = () => {
 
   return (
     <div className="animate-fade-in mx-auto max-w-[700px] px-6 py-10">
-      {/* Breadcrumb */}
       <Link
         to="/onboard"
         className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-text-muted transition-colors hover:text-primary"
@@ -188,7 +186,6 @@ const StepDetail = () => {
         Back to Onboarding
       </Link>
 
-      {/* Header */}
       <div className="mb-8 flex items-start gap-5">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary-dim/15 text-3xl shadow-sm">
           {guide.icon}
@@ -201,7 +198,6 @@ const StepDetail = () => {
         </div>
       </div>
 
-      {/* Status Banner */}
       {completed && (
         <div className="animate-fade-in mb-6 flex items-center gap-3 rounded-lg border border-success/20 bg-success-bg px-5 py-4">
           <svg className="h-5 w-5 shrink-0 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,7 +207,6 @@ const StepDetail = () => {
         </div>
       )}
 
-      {/* Instructions Card */}
       <div className="mb-6 rounded-xl border border-border-default bg-bg-card p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-extrabold uppercase tracking-widest text-text-muted">How to Complete</h2>
         <ol className="flex flex-col gap-4">
@@ -226,7 +221,6 @@ const StepDetail = () => {
         </ol>
       </div>
 
-      {/* Tip */}
       <div className="mb-6 flex items-start gap-3 rounded-lg border border-accent-gold/20 bg-accent-gold/5 px-5 py-4">
         <span className="mt-0.5 text-lg">💡</span>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -234,7 +228,6 @@ const StepDetail = () => {
         </p>
       </div>
 
-      {/* External Link */}
       {guide.externalLink && (
         <a
           href={guide.externalLink.url}
@@ -249,7 +242,6 @@ const StepDetail = () => {
         </a>
       )}
 
-      {/* Feedback Toast */}
       {feedback && (
         <div className={`animate-fade-in mb-6 rounded-lg border px-5 py-4 text-sm font-semibold ${
           feedback.type === 'success'
@@ -260,7 +252,6 @@ const StepDetail = () => {
         </div>
       )}
 
-      {/* Action Buttons */}
       <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
         {!completed ? (
           <button

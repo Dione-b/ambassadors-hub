@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getCurrentMeetings, hasUserAttended, registerAttendance, getOnboardingSteps } from '../../services/mockApi';
+import { fetchCurrentMeetings, fetchHasUserAttended, fetchRegisterAttendance, fetchOnboardingSteps } from '../../services/apiClient';
 import MeetingCard from '../../components/MeetingCard';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,11 +19,12 @@ const Dashboard = () => {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const [meetings, steps] = await Promise.all([getCurrentMeetings(), getOnboardingSteps(user.id)]);
+      const [meetings, steps] = await Promise.all([fetchCurrentMeetings(), fetchOnboardingSteps(user.id)]);
       setOnboardSteps(steps);
-      if (meetings.length > 0) {
-        setMeeting(meetings[0]);
-        const att = await hasUserAttended(user.id, meetings[0].id);
+      const openMeeting = meetings.find(m => m.isOpen);
+      if (openMeeting) {
+        setMeeting(openMeeting);
+        const att = await fetchHasUserAttended(user.id, openMeeting.id);
         setAttended(att);
       }
     } catch (err) { console.error(err); }
@@ -37,7 +38,7 @@ const Dashboard = () => {
     setSubmitting(true);
     setFeedback({ type: '', msg: '' });
     try {
-      const res = await registerAttendance(user.id, meeting.id, password);
+      const res = await fetchRegisterAttendance(user.id, meeting.id, password);
       if (res.success) {
         updateUser({ points: user.points + 10 });
         setAttended(true);
@@ -108,35 +109,28 @@ const Dashboard = () => {
       {/* Meeting Section */}
       <h2 className="mb-5 text-lg font-extrabold uppercase tracking-wide text-text-primary">Weekly Global Sync</h2>
       <div className="max-w-[600px]">
-        {meeting ? (
+        {meeting && meeting.isOpen ? (
           <MeetingCard meeting={meeting} hasAttended={attended}>
             {!attended ? (
               <div className="flex flex-col gap-4">
-                {meeting.isOpen ? (
-                  <form className="flex gap-3" onSubmit={handleConfirmAttendance}>
-                    <input
-                      type="text"
-                      placeholder="Enter 4+ char password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value.toUpperCase())}
-                      required
-                      disabled={submitting}
-                      className="grow rounded-md border border-border-default bg-bg-input px-4 py-3 text-base font-semibold uppercase text-text-primary transition-all focus:border-primary-dim focus:shadow-[0_0_0_3px_rgba(99,102,241,0.15)] focus:outline-none disabled:opacity-50"
-                    />
-                    <button
-                      type="submit"
-                      disabled={password.trim().length < 4 || submitting}
-                      className="whitespace-nowrap rounded-md bg-primary-dim px-6 text-sm font-bold text-white transition-all hover:bg-primary hover:shadow-glow-primary disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {submitting ? 'Verifying...' : 'Register'}
-                    </button>
-                  </form>
-                ) : (
-                  <div className="flex items-center gap-3 rounded-sm border-l-[3px] border-l-border-default bg-bg-elevated/60 px-4 py-3.5 text-sm text-text-muted">
-                    <span className="text-lg">🔒</span>
-                    Wait for the Admin to open the attendance window during the sync.
-                  </div>
-                )}
+                <form className="flex gap-3" onSubmit={handleConfirmAttendance}>
+                  <input
+                    type="text"
+                    placeholder="Enter 4+ char password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value.toUpperCase())}
+                    required
+                    disabled={submitting}
+                    className="grow rounded-md border border-border-default bg-bg-input px-4 py-3 text-base font-semibold uppercase text-text-primary transition-all focus:border-primary-dim focus:shadow-[0_0_0_3px_rgba(99,102,241,0.15)] focus:outline-none disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={password.trim().length < 4 || submitting}
+                    className="whitespace-nowrap rounded-md bg-primary-dim px-6 text-sm font-bold text-white transition-all hover:bg-primary hover:shadow-glow-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {submitting ? 'Verifying...' : 'Register'}
+                  </button>
+                </form>
                 {feedback.msg && (
                   <div className={`animate-fade-in rounded-md border px-4 py-3 text-sm font-semibold ${
                     feedback.type === 'success' ? 'border-success/20 bg-success-bg text-success' : 'border-danger/20 bg-danger-bg text-danger'
@@ -152,7 +146,7 @@ const Dashboard = () => {
             )}
           </MeetingCard>
         ) : (
-          <p className="text-sm italic text-text-muted">No meetings scheduled right now.</p>
+          <p className="text-sm italic text-text-muted">There are no open attendance windows right now.</p>
         )}
       </div>
     </div>

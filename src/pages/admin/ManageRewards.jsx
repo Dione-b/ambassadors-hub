@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRewards, distributeReward, getAllUsers } from '../../services/mockApi';
+import { fetchRewards, fetchDistributeReward, fetchAllUsers } from '../../services/apiClient';
 import RewardCard from '../../components/RewardCard';
 
 const ManageRewards = () => {
@@ -15,7 +15,7 @@ const ManageRewards = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [rData, uData] = await Promise.all([getRewards(), getAllUsers()]);
+      const [rData, uData] = await Promise.all([fetchRewards(), fetchAllUsers()]);
       rData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       setRewards(rData);
       setUsers(uData);
@@ -33,7 +33,7 @@ const ManageRewards = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await distributeReward({ title, amount_xlm: Number(amount), user_id: Number(selectedUser) });
+      await fetchDistributeReward({ title, amount_xlm: Number(amount), user_id: Number(selectedUser) });
       resetForm();
       fetchData();
     } catch (err) { console.error(err); }
@@ -48,7 +48,6 @@ const ManageRewards = () => {
 
   return (
     <div className="animate-fade-in mx-auto max-w-[1000px] px-6 py-10">
-      {/* Header */}
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="mb-1 text-3xl font-extrabold text-text-primary">XLM Rewards</h1>
@@ -61,7 +60,6 @@ const ManageRewards = () => {
         )}
       </div>
 
-      {/* Form */}
       {showForm && (
         <div className="animate-slide-up mb-10 rounded-xl border border-border-bright bg-bg-card p-7 shadow-glow-primary">
           <h2 className="mb-5 text-lg font-extrabold text-text-primary">New Distribution</h2>
@@ -96,7 +94,6 @@ const ManageRewards = () => {
         </div>
       )}
 
-      {/* History */}
       <div className="mt-4">
         <h3 className="mb-5 border-b border-border-subtle pb-2 text-lg font-extrabold text-text-primary">Distribution History</h3>
         {rewards.length === 0 ? (

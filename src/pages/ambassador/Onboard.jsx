@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getOnboardingSteps, awardGenesisBadge } from '../../services/mockApi';
+import { fetchOnboardingSteps, fetchAwardGenesisBadge } from '../../services/apiClient';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import confetti from 'canvas-confetti';
 import { useNavigate } from 'react-router-dom';
@@ -53,13 +53,12 @@ const Onboard = () => {
 
   const fetchSteps = useCallback(async () => {
     try {
-      const stepsData = await getOnboardingSteps(user.id);
+      const stepsData = await fetchOnboardingSteps(user.id);
       setSteps(stepsData);
 
-      // Check if all steps were completed (e.g. from the detail page)
       const allDone = stepsData.every(s => s.completed);
       if (allDone && !user.onboarded) {
-        const fullyOnboarded = await awardGenesisBadge(user.id);
+        const fullyOnboarded = await fetchAwardGenesisBadge(user.id);
         updateUser({
           points: fullyOnboarded.points,
           badges: fullyOnboarded.badges,
@@ -73,7 +72,6 @@ const Onboard = () => {
     } catch (err) { console.error(err); }
   }, [user.id, user.onboarded]);
 
-  // Initial load
   useEffect(() => {
     const init = async () => {
       setLoading(true);
@@ -83,7 +81,6 @@ const Onboard = () => {
     init();
   }, [fetchSteps]);
 
-  // Re-fetch when user returns to this tab (after completing a step in StepDetail)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -138,14 +135,12 @@ const Onboard = () => {
         <VideoThumbnail />
       </div>
 
-      {/* Hint */}
       <p className="mb-4 text-xs font-semibold text-text-muted">
         💡 Click on any step card to view detailed instructions.
       </p>
 
       <OnboardingProgress steps={steps} />
 
-      {/* Celebration Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md">
           <div className="animate-slide-up mx-4 w-full max-w-sm rounded-2xl border border-primary/30 bg-bg-card p-8 text-center shadow-glow-primary">

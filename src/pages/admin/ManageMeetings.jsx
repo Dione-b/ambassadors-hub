@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getAllMeetings, setMeetingPassword, toggleMeetingWindow, getMeetingAttendees } from '../../services/mockApi';
+import { fetchAllMeetings, fetchSetMeetingPassword, fetchToggleMeetingWindow, fetchMeetingAttendees } from '../../services/apiClient';
 import MeetingCard from '../../components/MeetingCard';
 
 const ManageMeetings = () => {
@@ -12,13 +12,13 @@ const ManageMeetings = () => {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getAllMeetings();
+      const data = await fetchAllMeetings();
       data.sort((a, b) => new Date(b.date) - new Date(a.date));
       setMeetings(data);
       const aMap = {};
       const pMap = {};
       await Promise.all(data.map(async (m) => {
-        aMap[m.id] = await getMeetingAttendees(m.id);
+        aMap[m.id] = await fetchMeetingAttendees(m.id);
         pMap[m.id] = m.password || '';
       }));
       setAttendeesMap(aMap);
@@ -36,14 +36,14 @@ const ManageMeetings = () => {
 
   const handleSetPassword = async (meetingId) => {
     try {
-      await setMeetingPassword(meetingId, passwords[meetingId]);
+      await fetchSetMeetingPassword(meetingId, passwords[meetingId]);
       showFeedback(meetingId, 'success', 'Password updated.');
       loadData();
     } catch (err) { showFeedback(meetingId, 'error', err.message); }
   };
 
   const handleToggleWindow = async (meetingId) => {
-    try { await toggleMeetingWindow(meetingId); loadData(); }
+    try { await fetchToggleMeetingWindow(meetingId); loadData(); }
     catch (err) { showFeedback(meetingId, 'error', err.message); }
   };
 
@@ -71,7 +71,6 @@ const ManageMeetings = () => {
 
             return (
               <MeetingCard key={meeting.id} meeting={meeting}>
-                {/* Admin Controls */}
                 <div className="mb-6 flex flex-col gap-4">
                   <div className="flex flex-wrap gap-3">
                     <input
@@ -107,7 +106,6 @@ const ManageMeetings = () => {
                   )}
                 </div>
 
-                {/* Attendees */}
                 <div className="border-t border-dashed border-border-subtle pt-4">
                   <h4 className="mb-3 text-xs font-bold uppercase tracking-wide text-text-muted">
                     Attendees ({attendees.length})

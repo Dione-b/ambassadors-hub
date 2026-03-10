@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getRewards } from '../../services/mockApi';
+import { fetchRewards } from '../../services/apiClient';
 import BadgeList from '../../components/BadgeList';
 import RewardCard from '../../components/RewardCard';
 
@@ -12,7 +12,7 @@ const Profile = () => {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const allRewards = await getRewards();
+      const allRewards = await fetchRewards();
       setRewardsHistory(allRewards.filter(r => r.user_id === user.id));
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -25,7 +25,6 @@ const Profile = () => {
   return (
     <div className="animate-fade-in px-6 py-10">
       <div className="mx-auto flex max-w-[800px] flex-col gap-8">
-        {/* Profile Info Card */}
         <div className="relative flex items-center gap-6 overflow-hidden rounded-xl border border-border-default bg-bg-card p-8">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-bg-base bg-gradient-to-br from-primary-dim to-secondary-dim text-4xl font-extrabold text-white shadow-[0_0_0_2px_var(--color-primary-dim)]">
             {initials}
@@ -47,7 +46,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Details Grid */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5">
           <div className="flex flex-col gap-1.5 rounded-lg border border-border-subtle bg-bg-card p-5">
             <span className="text-[0.7rem] font-bold uppercase tracking-wide text-text-muted">Location</span>
@@ -65,13 +63,11 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Badges */}
         <div className="flex flex-col gap-4">
           <h3 className="border-b border-border-subtle pb-2 text-lg font-bold text-text-primary">Badges Collection</h3>
           <BadgeList badges={user.badges} />
         </div>
 
-        {/* Rewards History */}
         <div className="flex flex-col gap-4">
           <h3 className="border-b border-border-subtle pb-2 text-lg font-bold text-text-primary">XLM Rewards History</h3>
           {loading ? (

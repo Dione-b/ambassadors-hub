@@ -1,4 +1,8 @@
-// In-memory data structures modeled after the global database spec
+// ==========================================================
+// MOCK DATA STORE — Synchronous business logic layer
+// Used by MSW handlers to simulate a real backend
+// ==========================================================
+
 const mock_data = {
   users: [
     { id: 1, name: 'Alice Chen', city: 'Singapore', country: 'Singapore', points: 0, badges: [], stellar_wallet: 'GABC123...', onboarded: false },
@@ -7,9 +11,8 @@ const mock_data = {
     { id: 4, name: 'John Smith', city: 'London', country: 'UK', points: 310, badges: ['Wallet Connected', 'Community Joined', 'First Meeting', 'Trained Ambassador', 'Content Creator'], stellar_wallet: 'GHIJ012...', onboarded: true }
   ],
   meetings: [
-    // Provide meetings that emulate past, current, and future scenarios
     { id: 1, title: 'Global Sync - Americas', date: '2026-03-17T18:00:00.000Z', timezone: 'America/New_York', password: null, isOpen: false, validityWindowMinutes: 15 },
-    { id: 2, title: 'Global Sync - EMEA', date: new Date(Date.now() - 1000 * 60 * 5).toISOString(), timezone: 'Europe/London', password: 'STELLAR2026', isOpen: true, validityWindowMinutes: 60 } // Open meeting to test attendance
+    { id: 2, title: 'Global Sync - EMEA', date: new Date(Date.now() - 1000 * 60 * 5).toISOString(), timezone: 'Europe/London', password: 'STELLAR2026', isOpen: true, validityWindowMinutes: 60 }
   ],
   attendances: [
     { user_id: 2, meeting_id: 1, registered_at: '2026-03-17T18:05:00.000Z' },
@@ -28,21 +31,15 @@ const ALL_ONBOARDING_STEPS = [
   { name: 'Complete Ambassador Training', description: 'Watch training video and pass a simple quiz (simulated)', badge_awarded: 'Trained Ambassador', points: 30 }
 ];
 
-// Deep clones to avoid reference mutation between re-renders
+// Deep clones to avoid reference mutation
 let users = JSON.parse(JSON.stringify(mock_data.users));
 let meetings = JSON.parse(JSON.stringify(mock_data.meetings));
 let attendances = JSON.parse(JSON.stringify(mock_data.attendances));
 let rewards = JSON.parse(JSON.stringify(mock_data.rewards));
 
-const delay = (ms = 250) => new Promise(resolve => setTimeout(resolve, ms));
+// --- ONBOARDING ---
 
-// --- ONBOARDING ACTIONS ---
-
-/**
- * Returns progress for an individual user based on earned badges
- */
-export const getOnboardingSteps = async (userId) => {
-  await delay();
+export const getOnboardingSteps = (userId) => {
   const user = users.find(u => u.id === userId);
   if (!user) throw new Error('User not found');
 
@@ -52,98 +49,70 @@ export const getOnboardingSteps = async (userId) => {
   }));
 };
 
-/**
- * Marks a step as complete, awards points and badge, checks system status
- */
-export const completeStep = async (userId, stepName) => {
-  await delay();
+export const completeStep = (userId, stepName) => {
   const user = users.find(u => u.id === userId);
   if (!user) throw new Error('User not found');
 
   const stepDef = ALL_ONBOARDING_STEPS.find(s => s.name === stepName);
   if (!stepDef) throw new Error('Invalid onboarding step');
+  if (user.badges.includes(stepDef.badge_awarded)) throw new Error('Step already completed');
 
-  if (user.badges.includes(stepDef.badge_awarded)) {
-    throw new Error('Step already completed');
-  }
-
-  // Grant rewards
   user.badges.push(stepDef.badge_awarded);
   user.points += stepDef.points;
 
-  // Check if fully onboarded
-  const completedBadgesCount = ALL_ONBOARDING_STEPS.filter(s => user.badges.includes(s.badge_awarded)).length;
-  if (completedBadgesCount === ALL_ONBOARDING_STEPS.length) {
-    user.onboarded = true;
-  }
+  const allCompleted = ALL_ONBOARDING_STEPS.every(s => user.badges.includes(s.badge_awarded));
+  if (allCompleted) user.onboarded = true;
 
   return { ...user };
 };
 
-// --- MEETINGS ACTIONS ---
+export const awardGenesisBadge = (userId) => {
+  const user = users.find(u => u.id === userId);
+  if (!user) throw new Error('User not found');
 
-export const getCurrentMeetings = async () => {
-  await delay();
-  // Sort descending by date
+  if (!user.badges.includes('Genesis Ambassador')) {
+    user.badges.push('Genesis Ambassador');
+  }
+  return { ...user };
+};
+
+// --- MEETINGS ---
+
+export const getCurrentMeetings = () => {
   return [...meetings].sort((a, b) => new Date(b.date) - new Date(a.date));
 };
 
-export const getAllMeetings = async () => {
-  await delay();
+export const getAllMeetings = () => {
   return meetings.map(m => ({ ...m }));
 };
 
-export const setMeetingPassword = async (meetingId, password) => {
-  await delay();
+export const setMeetingPassword = (meetingId, password) => {
   const meeting = meetings.find(m => m.id === meetingId);
   if (!meeting) throw new Error('Meeting not found');
-  
+
   meeting.password = password?.trim().toUpperCase() || null;
   return { ...meeting };
 };
 
-export const toggleMeetingWindow = async (meetingId) => {
-  await delay();
+export const toggleMeetingWindow = (meetingId) => {
   const meeting = meetings.find(m => m.id === meetingId);
   if (!meeting) throw new Error('Meeting not found');
-  if (!meeting.password && !meeting.isOpen) {
-    throw new Error('Password must be set before opening the window');
-  }
-  
+  if (!meeting.password && !meeting.isOpen) throw new Error('Password must be set before opening the window');
+
   meeting.isOpen = !meeting.isOpen;
   return { ...meeting };
 };
 
-export const registerAttendance = async (userId, meetingId, password) => {
-  await delay();
-  
+export const registerAttendance = (userId, meetingId, password) => {
   const meeting = meetings.find(m => m.id === meetingId);
   if (!meeting) throw new Error('Meeting not found');
   if (!meeting.isOpen) throw new Error('Attendance window is currently closed');
-  if (meeting.password !== password?.trim().toUpperCase()) {
-    throw new Error('Incorrect password');
-  }
-
-  // Validate window validity time
-  const meetingStart = new Date(meeting.date);
-  const now = new Date();
-  const minutesDifference = (now.getTime() - meetingStart.getTime()) / (1000 * 60);
-  
-  // Note: in testing, this strict window might prevent manual registration if the mock meeting time is old.
-  // We allow it to pass if minutesDifference < 0 (early) or within window (unless we strictly enforce). 
-  // Let's enforce it strictly based on the spec. 
-  if (minutesDifference > meeting.validityWindowMinutes && process.env.NODE_ENV !== 'development') {
-    // throw new Error(`Attendance validity window (${meeting.validityWindowMinutes}m) has expired.`);
-  }
+  if (meeting.password !== password?.trim().toUpperCase()) throw new Error('Incorrect password');
 
   const alreadyAttended = attendances.some(a => a.user_id === userId && a.meeting_id === meetingId);
   if (alreadyAttended) throw new Error('You have already registered attendance for this meeting');
 
-  attendances.push({
-    user_id: userId,
-    meeting_id: meetingId,
-    registered_at: now.toISOString()
-  });
+  attendances.push({ user_id: userId, meeting_id: meetingId, registered_at: new Date().toISOString() });
 
   const user = users.find(u => u.id === userId);
   if (user) user.points += 10;
@@ -151,13 +120,11 @@ export const registerAttendance = async (userId, meetingId, password) => {
   return { success: true, message: 'Attendance registered! +10 points 🎉' };
 };
 
-export const hasUserAttended = async (userId, meetingId) => {
-  await delay();
+export const hasUserAttended = (userId, meetingId) => {
   return attendances.some(a => a.user_id === userId && a.meeting_id === meetingId);
 };
 
-export const getMeetingAttendees = async (meetingId) => {
-  await delay();
+export const getMeetingAttendees = (meetingId) => {
   return attendances
     .filter(a => a.meeting_id === meetingId)
     .map(a => {
@@ -166,51 +133,33 @@ export const getMeetingAttendees = async (meetingId) => {
     });
 };
 
-// --- USER MANAGEMENT ---
+// --- USERS ---
 
-export const getUserProfile = async (userId) => {
-  await delay();
+export const getUserProfile = (userId) => {
   const user = users.find(u => u.id === userId);
   return user ? { ...user } : null;
 };
 
-export const getAllUsers = async () => {
-  await delay();
+export const getAllUsers = () => {
   return users.map(u => ({ ...u }));
 };
 
-export const updateUser = async (userId, updates) => {
-  await delay();
+export const updateUser = (userId, updates) => {
   const index = users.findIndex(u => u.id === userId);
   if (index === -1) throw new Error('User not found');
-  
+
   users[index] = { ...users[index], ...updates };
   return { ...users[index] };
 };
 
-export const awardGenesisBadge = async (userId) => {
-  await delay();
-  const index = users.findIndex(u => u.id === userId);
-  if (index === -1) throw new Error('User not found');
-  
-  if (!users[index].badges.includes('Genesis Ambassador')) {
-    users[index].badges.push('Genesis Ambassador');
-  }
-  return { ...users[index] };
-};
-
-
 // --- REWARDS ---
 
-export const getRewards = async () => {
-  await delay();
+export const getRewards = () => {
   return rewards.map(r => ({ ...r }));
 };
 
-export const distributeReward = async ({ title, amount_xlm, user_id }) => {
-  await delay();
+export const distributeReward = ({ title, amount_xlm, user_id }) => {
   const txHash = `sim_tx_${Math.random().toString(36).substring(2, 10)}${Date.now()}`;
-  
   const newReward = {
     id: Date.now(),
     title,
@@ -219,8 +168,7 @@ export const distributeReward = async ({ title, amount_xlm, user_id }) => {
     transaction_hash: txHash,
     created_at: new Date().toISOString()
   };
-  
+
   rewards.push(newReward);
   return newReward;
 };
-

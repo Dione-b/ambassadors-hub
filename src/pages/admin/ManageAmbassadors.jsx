@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllUsers, updateUser } from '../../services/mockApi';
+import { fetchAllUsers, fetchUpdateUser } from '../../services/apiClient';
 import BadgeList from '../../components/BadgeList';
 
 const ManageAmbassadors = () => {
@@ -13,7 +13,7 @@ const ManageAmbassadors = () => {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const data = await getAllUsers();
+      const data = await fetchAllUsers();
       data.sort((a, b) => b.points - a.points);
       setUsers(data);
     } catch (err) { console.error(err); }
@@ -30,7 +30,7 @@ const ManageAmbassadors = () => {
       if (newBadge.trim() !== '' && !user.badges?.includes(newBadge.trim())) {
         updates.badges = [...(user.badges || []), newBadge.trim()];
       }
-      await updateUser(user.id, updates);
+      await fetchUpdateUser(user.id, updates);
       setEditId(null);
       loadUsers();
     } catch (err) { alert(err.message); }
@@ -64,7 +64,6 @@ const ManageAmbassadors = () => {
               const editing = editId === u.id;
               return (
                 <tr key={u.id} className="border-b border-border-subtle transition-colors last:border-b-0 hover:bg-bg-card-hover">
-                  {/* Ambassador */}
                   <td className="px-5 py-4 align-middle">
                     <div className="flex items-center gap-3.5">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-dim to-secondary-dim text-xs font-extrabold text-white">
@@ -76,9 +75,7 @@ const ManageAmbassadors = () => {
                       </div>
                     </div>
                   </td>
-                  {/* Location */}
                   <td className="px-5 py-4 align-middle text-sm font-medium text-text-secondary">{u.city}, {u.country}</td>
-                  {/* Status */}
                   <td className="px-5 py-4 align-middle">
                     {editing ? (
                       <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-text-primary">
@@ -93,7 +90,6 @@ const ManageAmbassadors = () => {
                       </span>
                     )}
                   </td>
-                  {/* Points */}
                   <td className="px-5 py-4 align-middle">
                     {editing ? (
                       <input type="number" value={points} onChange={e => setPoints(Number(e.target.value))}
@@ -102,7 +98,6 @@ const ManageAmbassadors = () => {
                       <span className="text-base font-extrabold text-accent-gold">★ {u.points}</span>
                     )}
                   </td>
-                  {/* Badges */}
                   <td className="px-5 py-4 align-middle">
                     {editing ? (
                       <div className="flex flex-col gap-3">
@@ -114,7 +109,6 @@ const ManageAmbassadors = () => {
                       <BadgeList badges={u.badges} />
                     )}
                   </td>
-                  {/* Actions */}
                   <td className="px-5 py-4 text-right align-middle">
                     {editing ? (
                       <div className="flex flex-wrap justify-end gap-2">

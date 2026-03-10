@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllUsers, getAllMeetings, getRewards } from '../../services/mockApi';
+import { fetchAllUsers, fetchAllMeetings, fetchRewards } from '../../services/apiClient';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -10,7 +10,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const [users, meetings, rewards] = await Promise.all([getAllUsers(), getAllMeetings(), getRewards()]);
+        const [users, meetings, rewards] = await Promise.all([fetchAllUsers(), fetchAllMeetings(), fetchRewards()]);
         setMetrics({
           totalAmbassadors: users.length,
           fullyOnboarded: users.filter((u) => u.onboarded).length,

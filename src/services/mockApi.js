@@ -188,6 +188,18 @@ export const updateUser = async (userId, updates) => {
   return { ...users[index] };
 };
 
+export const awardGenesisBadge = async (userId) => {
+  await delay();
+  const index = users.findIndex(u => u.id === userId);
+  if (index === -1) throw new Error('User not found');
+  
+  if (!users[index].badges.includes('Genesis Ambassador')) {
+    users[index].badges.push('Genesis Ambassador');
+  }
+  return { ...users[index] };
+};
+
+
 // --- REWARDS ---
 
 export const getRewards = async () => {
@@ -211,3 +223,4 @@ export const distributeReward = async ({ title, amount_xlm, user_id }) => {
   rewards.push(newReward);
   return newReward;
 };
+

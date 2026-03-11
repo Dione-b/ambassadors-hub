@@ -144,11 +144,34 @@ export const getAllUsers = () => {
   return users.map(u => ({ ...u }));
 };
 
-export const updateUser = (userId, updates) => {
+const ALLOWED_FIELDS_BY_ROLE = {
+  ambassador: ['city', 'country'],
+  admin: ['name', 'email', 'city', 'country', 'stellar_wallet', 'points', 'badges', 'onboarded'],
+};
+
+export const updateUser = (userId, updates, requesterRole = 'admin', requesterId = null) => {
+  // Ambassadors can only edit their own profile
+  if (requesterRole !== 'admin' && requesterId !== userId) {
+    throw new Error('You can only edit your own profile.');
+  }
+
   const index = users.findIndex(u => u.id === userId);
   if (index === -1) throw new Error('User not found');
 
-  users[index] = { ...users[index], ...updates };
+  const allowedFields = ALLOWED_FIELDS_BY_ROLE[requesterRole] || [];
+  const filteredUpdates = {};
+  for (const key of Object.keys(updates)) {
+    if (allowedFields.includes(key)) {
+      filteredUpdates[key] = updates[key];
+    }
+  }
+
+  // Ensure badge uniqueness when admin edits badges
+  if (filteredUpdates.badges && requesterRole === 'admin') {
+    filteredUpdates.badges = [...new Set(filteredUpdates.badges)];
+  }
+
+  users[index] = { ...users[index], ...filteredUpdates };
   return { ...users[index] };
 };
 

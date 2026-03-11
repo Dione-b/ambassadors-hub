@@ -42,7 +42,7 @@ const AmbassadorDetail = () => {
       if (newBadge.trim() !== '' && !user.badges?.includes(newBadge.trim())) {
         updates.badges = [...(user.badges || []), newBadge.trim()];
       }
-      await fetchUpdateUser(user.id, updates);
+      await fetchUpdateUser(user.id, updates, 'admin', 99);
       await loadUser();
       setIsEditing(false);
       setNewBadge('');

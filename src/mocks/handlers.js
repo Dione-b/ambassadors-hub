@@ -109,8 +109,8 @@ export const handlers = [
   http.patch('/api/users/:userId', async ({ params, request }) => {
     await delay(200);
     try {
-      const updates = await request.json();
-      const updated = db.updateUser(Number(params.userId), updates);
+      const { requesterRole, requesterId, ...updates } = await request.json();
+      const updated = db.updateUser(Number(params.userId), updates, requesterRole, requesterId);
       return HttpResponse.json(updated);
     } catch (err) {
       return HttpResponse.json({ error: err.message }, { status: 400 });

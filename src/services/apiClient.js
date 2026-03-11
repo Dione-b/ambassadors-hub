@@ -101,11 +101,11 @@ export const fetchAllUsers = async () => {
   return handleResponse(res);
 };
 
-export const fetchUpdateUser = async (userId, updates) => {
+export const fetchUpdateUser = async (userId, updates, requesterRole = 'admin', requesterId = null) => {
   const res = await fetch(`${BASE_URL}/users/${userId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
+    body: JSON.stringify({ ...updates, requesterRole, requesterId }),
   });
   return handleResponse(res);
 };
